@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import shutil
 
@@ -21,6 +24,8 @@ class Bzip2Conan(ConanFile):
                   " available techniques (the PPM family of statistical compressors), whilst " \
                   "being around twice as fast at compression and six times faster at decompression."
 
+    requires = 'helpers/0.3@ntc/stable'
+
     @property
     def zip_folder_name(self):
         return "bzip2-%s" % self.version
@@ -30,7 +35,10 @@ class Bzip2Conan(ConanFile):
 
     def source(self):
         zip_name = "bzip2-%s.tar.gz" % self.version
-        tools.download("http://www.bzip.org/%s/%s" % (self.version, zip_name), zip_name)
+
+        from source_cache import copyFromCache
+        if not copyFromCache(zip_name):
+            tools.download("http://www.bzip.org/%s/%s" % (self.version, zip_name), zip_name)
         tools.check_md5(zip_name, "00b516f4704d4a7cb50a1d97e6e8e15b")
         tools.unzip(zip_name)
         os.unlink(zip_name)
@@ -57,3 +65,5 @@ class Bzip2Conan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ['bz2']
+
+# vim: ts=4 sw=4 expandtab ffs=unix ft=python foldmethod=marker :
